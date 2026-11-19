@@ -4,7 +4,7 @@ Self-study log. Goal: measure how much of a neural-network update is really
 there — the effective rank of the update matrix ΔW — and how it changes
 across optimizers and training conditions.
 
-Status: week 1. Three small experiments so far.
+Status: week 1. Four small experiments so far.
 
 ## What this repo contains
 
@@ -13,6 +13,7 @@ Status: week 1. Three small experiments so far.
 | `01_ols_1d.py` | least squares `y = a*x + b` solved by SGD and Adam; learning-rate sweep |
 | `02.py` | correlated parameters: what happens when `a` and `b` can substitute for each other |
 | `03.py` | singular values and effective rank: from the data matrix to the update matrix |
+| `04_optimizers_by_hand.py` | SGD, momentum and Adam written out by hand and checked step by step against `torch.optim` |
 
 ## How to run
 
@@ -20,6 +21,7 @@ Status: week 1. Three small experiments so far.
 python 01_ols_1d.py
 python 02.py
 python 03.py
+python 04_optimizers_by_hand.py
 ```
 
 Python 3.13, PyTorch 2.15 (CPU), NumPy. No GPU required.
@@ -75,9 +77,20 @@ Python 3.13, PyTorch 2.15 (CPU), NumPy. No GPU required.
     8, 32 and 64 (effective rank 7.4, 23.6 and 39.6). So the batch size,
     not the layer, sets the ceiling.
 
+### 04 — optimizers written out by hand
+
+15. Writing SGD, momentum and Adam out by hand and feeding them the same
+    gradient reproduces `torch.optim` to within 1e-8 over five steps, which
+    is float32 precision. The one detail that had to be matched exactly:
+    PyTorch's momentum buffer is `buf = mu*buf + grad`, with no `(1-mu)`
+    factor, so the same learning rate means a different step size in the
+    textbook form.
+16. Adam's first step moves by `lr * sign(grad)` regardless of the gradient
+    magnitude: a gradient of `(-4.22, -3.01)` gives the same displacement in
+    both coordinates.
+
 ## Not here yet
 
-- momentum and Adam implemented by hand
 - an experiment whose outcome I do not already know; everything above
   reproduces results that are standard in the literature
 
